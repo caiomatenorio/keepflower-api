@@ -1,0 +1,565 @@
+openapi: 3.1.0
+
+info:
+  title: KeepFlower API - Task, Routine, and Medication Management
+  description: >
+    KeepFlower API provides a robust, scalable backend to support client applications
+    (mobile and web) for seamless task management, personalized routines, reminders,
+    and medication tracking. Designed with security, performance, and extensibility in mind,
+    it empowers users to stay organized and maintain healthy habits effortlessly.
+  version: 1.0.0
+
+servers:
+  - url: 'http'
+
+security:
+  - cookieAuth: [ ]
+
+paths:
+  /ping:
+    get:
+      operationId: ping
+      summary: Ping the server.
+      description: Ping the server to check if it is running.
+      tags:
+        - General
+      security: [ ]
+      responses:
+        200:
+          description: The server is running and responsive.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+              example:
+                message: Pong! The server is running.
+        500:
+          description: >
+            An error occurred while processing the request.
+            Possible error codes include: E000.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                message: An unknown error occurred.
+                errorCode: E000
+
+  /auth/signup:
+    post:
+      operationId: signup
+      summary: Create a new user account.
+      description: Create a new user account.
+      tags:
+        - Authentication
+        - User account management
+      security: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignUpRequest"
+      responses:
+        201:
+          description: User account created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+              example:
+                message: User account created successfully.
+        400:
+          description: >
+            Bad request due to validation errors.
+            Possible error codes include: E001, VE001, VE002, VE003, VE004, VE005.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponseWithFields"
+              example:
+                message: A validation error occurred.
+                errorCode: E001
+                fieldErrors:
+                  name:
+                    - message: Name is required.
+                      errorCode: VE001
+                    - message: Name must be between 1 and 100 characters.
+                      errorCode: VE002
+                    - message: Name must not be blank.
+                      errorCode: VE003
+                  email:
+                    - message: Email is required.
+                      errorCode: VE001
+                    - message: Invalid email format
+                      errorCode: VE004
+                  password:
+                    - message: Password is required.
+                      errorCode: VE001
+                    - message: Password must be between 8 and 128 characters.
+                      errorCode: VE002
+                    - message: Password must contain at least one uppercase letter, one lowercase letter, and one digit.
+                      errorCode: VE005
+        409:
+          description: >
+            Email already in use. 
+            Possible error codes include: E002.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                message: Email already in use.
+                errorCode: E002
+        500:
+          description: >
+            Unknown error.
+            Possible error codes include: E000.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                message: An unknown error occurred.
+                errorCode: E000
+
+  /auth/login:
+    post:
+      operationId: login
+      summary: Create a new user session.
+      description: Login with user's credentials and receive access and refresh tokens.
+      tags:
+        - Authentication
+      security: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LogInRequest"
+      responses:
+        200:
+          description: User logged in successfully, returning access and refresh tokens.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+              example:
+                message: Logged in successfully.
+          headers:
+            Set-Cookie:
+              description: >
+                The `access_token` cookie containing the JWT token for authenticated requests, with 15 minutes 
+                expiration; and the `refresh_token` cookie containing the 256 bits refresh token for obtaining new access tokens,
+                with 30 days expiration.
+              schema:
+                type: string
+              examples:
+                access_token:
+                  value: "access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkJ1bmR1ZG8iLCJpYXQiOjE3MDA4MDAwMDAsImV4cCI6MTcwMDgwMDkwMH0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=900"
+                refresh_token:
+                  value: "refresh_token=2f7e4b38a4c942e9b1f2f53d0b63d66dbf7fbe9a12ea4d09c5a730e4f2a18a13; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=2592000"
+        400:
+          description: >
+            Bad request due to validation errors.
+            Possible error codes include: E001, VE001, VE004.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponseWithFields"
+              example:
+                message: A validation error occurred.
+                errorCode: E001
+                fieldErrors:
+                  email:
+                    - message: Email is required.
+                      errorCode: VE001
+                    - message: Invalid email format
+                      errorCode: VE004
+                  password:
+                    - message: Password is required.
+                      errorCode: VE001
+        401:
+          description: >
+            Invalid credentials.
+            Possible error codes include: E003.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                message: Invalid email or password.
+                errorCode: E003
+        500:
+          description: >
+            Unknown error.
+            Possible error codes include: E000.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                message: An unknown error occurred.
+                errorCode: E000
+
+  /auth/logout:
+    post:
+      operationId: logout
+      summary: Log out the user.
+      description: >
+        Log out the user by clearing the access and refresh tokens. The client should remove the cookies containing the 
+        tokens.
+      tags:
+        - Authentication
+      responses:
+        200:
+          description: User logged out successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+              example:
+                message: User logged out successfully.
+          headers:
+            Set-Cookie:
+              description: Clears the `access_token` and `refresh_token` cookies.
+              schema:
+                type: string
+              examples:
+                access_token:
+                  value: "access_token=; Path=/; HttpOnly; Secure; SameSite=Strict;"
+                refresh_token:
+                  value: "refresh_token=; Path=/; HttpOnly; Secure; SameSite=Strict;"
+        401:
+          description: >
+            Unauthorized access, log in or refresh your session.
+            Possible error codes include: E004.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                message: Unauthorized access, please log in or refresh your session.
+                errorCode: E004
+        500:
+          description: >
+            Unknown error.
+            Possible error codes include: E000.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                message: An unknown error occurred.
+                errorCode: E000
+
+  /auth/refresh:
+    post:
+      operationId: refreshSession
+      summary: Refresh user session using refresh token.
+      description: >
+        Refresh the user session by providing a valid `refresh_token` cookie. This will return a new access token and refresh 
+        token.
+      tags:
+        - Authentication
+      security:
+        - refreshTokenAuth: [ ]
+      responses:
+        200:
+          description: Session refreshed successfully, returning new access and refresh tokens.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+              example:
+                message: Session refreshed successfully.
+          headers:
+            Set-Cookie:
+              description: >
+                The new `access_token` cookie containing the JWT token for authenticated requests, with 15 minutes 
+                expiration; and the  new `refresh_token` cookie containing the 256 bits refresh token for obtaining new 
+                access tokens, with 30 days expiration.
+              schema:
+                type: string
+              examples:
+                access_token:
+                  value: "access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkJ1bmR1ZG8iLCJpYXQiOjE3MDA4MDAwMDAsImV4cCI6MTcwMDgwMDkwMH0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=900"
+                refresh_token:
+                  value: "refresh_token=2f7e4b38a4c942e9b1f2f53d0b63d66dbf7fbe9a12ea4d09c5a730e4f2a18a13; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=2592000"
+        401:
+          description: >
+            Session has expired or is invalid, please log in.
+            Possible error codes include: E005.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                message: Session expired or invalid, please log in.
+                errorCode: E005
+          headers:
+            Set-Cookie:
+              description: Clears the `access_token` and `refresh_token` cookies.
+              schema:
+                type: string
+              examples:
+                access_token:
+                  value: "access_token=; Path=/; HttpOnly; Secure; SameSite=Strict;"
+                refresh_token:
+                  value: "refresh_token=; Path=/; HttpOnly; Secure; SameSite=Strict;"
+        500:
+          description: >
+            Unknown error.
+            Possible error codes include: E000.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                message: An unknown error occurred.
+                errorCode: E000
+
+  /auth/status:
+    get:
+      operationId: getAuthStatus
+      summary: Get the current authentication status.
+      description: >
+        Check if the user is authenticated. To be valid, the request must include a valid `access_token` cookie.
+      tags:
+        - Authentication
+      responses:
+        200:
+          description: >
+            Returns the authentication status of the user. If authenticated, returns `true`; otherwise, returns `false`.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessResponseWithData"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/GetAuthStatusResponse"
+              example:
+                message: Authentication status retrieved successfully.
+                data:
+                  authenticated: true
+        500:
+          description: >
+            Unknown error.
+            Possible error codes include: E000.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                message: An unknown error occurred.
+                errorCode: E000
+
+  /users/me:
+    get:
+      operationId: getCurrentUser
+      summary: Get the current authenticated user's information.
+      description: Retrieve the information of the currently authenticated user.
+      tags:
+        - User account management
+      responses:
+        200:
+          description: Returns the information of the currently authenticated user, including name and email.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessResponseWithData"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/GetCurrentUserResponse"
+              example:
+                message: User information retrieved successfully.
+                data:
+                  name: John Doe
+                  email: johndoe@example.com
+        401:
+          description: >
+            Unauthorized access, please log in or refresh your session.
+            Possible error codes include: E004.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                message: Unauthorized access, please log in or refresh your session.
+                errorCode: E004
+        500:
+          description: >
+            Unknown error.
+            Possible error codes include: E000.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                message: An unknown error occurred.
+                errorCode: E000
+
+components:
+  schemas:
+    SignUpRequest:
+      type: object
+      description: Request schema for user sign up.
+      properties:
+        name:
+          type: string
+          description: Name for the new user.
+          minLength: 1
+          maxLength: 100
+          pattern: '^(?=.*\S).+$' # At least one non-whitespace character
+          example: John Doe
+        email:
+          type: string
+          description: Email for the new user.
+          format: email
+          example: johndoe@example.com
+        password:
+          type: string
+          description: Password for the new user.
+          format: password
+          minLength: 8
+          maxLength: 128
+          # Requires one lowercase, one uppercase, one digit, and accepts only the defined characters
+          pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d''"!@#$%^&*()\-_=+\[\]{};:,.<>\/?\|`~\s]{8,128}$'
+          example: Password@123
+      required:
+        - name
+        - email
+        - password
+
+    LogInRequest:
+      type: object
+      description: Request schema for user log in.
+      properties:
+        email:
+          type: string
+          description: User's email.
+          format: email
+          example: johndoe@example.com
+        password:
+          type: string
+          description: User's password.
+          format: password
+          example: Password@123
+      required:
+        - email
+        - password
+
+    GetAuthStatusResponse:
+      type: object
+      description: Response schema for authentication status.
+      properties:
+        authenticated:
+          type: boolean
+          description: Indicates if the user is authenticated.
+
+    GetCurrentUserResponse:
+      type: object
+      description: Response schema for the current authenticated user.
+      properties:
+        name:
+          type: string
+          description: Name of the authenticated user.
+        email:
+          type: string
+          description: Email of the authenticated user.
+          format: email
+
+    SuccessResponse:
+      type: object
+      description: Success response schema.
+      properties:
+        message:
+          type: string
+          description: A success message indicating the operation was successful.
+
+    SuccessResponseWithData:
+      description: Success response schema containing data.
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              description: Data returned from the operation, which can be an array or an object.
+
+    ErrorResponse:
+      type: object
+      description: Error response schema.
+      properties:
+        message:
+          type: string
+          description: A message indicating the error that occurred.
+        errorCode:
+          $ref: "#/components/schemas/ErrorCode"
+
+    ErrorResponseWithFields:
+      description: Error response schema containing field-specific errors.
+      allOf:
+        - $ref: "#/components/schemas/ErrorResponse"
+        - type: object
+          properties:
+            fieldErrors:
+              $ref: "#/components/schemas/FieldErrors"
+
+    FieldErrors:
+      type: object
+      description: Field-specific errors.
+      additionalProperties:
+        oneOf:
+          - type: 'null'
+            description: No errors for this field.
+          - type: array
+            description: Errors for this field.
+            properties:
+              message:
+                type: string
+                description: Error message for the field.
+              errorCode:
+                $ref: "#/components/schemas/ValidationErrorCode"
+
+    ErrorCode:
+      type: string
+      description: Error code indicating the type of error.
+      enum:
+        - E000 # Unknown error
+        - E001 # Validation error
+        - E002 # Email already in use
+        - E003 # Invalid credentials
+        - E004 # Unauthorized access
+        - E005 # Session expired
+
+    ValidationErrorCode:
+      type: string
+      description: Validation error code indicating the specific validation issue.
+      enum:
+        - VE001 # Required field missing
+        - VE002 # Out of length range
+        - VE003 # Blank input not allowed
+        - VE004 # Invalid email format
+        - VE005 # Weak password
+
+  securitySchemes:
+    cookieAuth:
+      description: >
+        Cookie-based authentication scheme. The client must include the `access_token`
+        cookie with a valid JWT token in each request to access protected endpoints.
+      type: apiKey
+      in: cookie
+      name: access_token
+
+    refreshTokenAuth:
+      description: >
+        Refresh token authentication scheme. The client must include the `refresh_token`
+        cookie with a valid refresh token to obtain a new access token and refresh token.
+      type: apiKey
+      in: cookie
+      name: refresh_token
