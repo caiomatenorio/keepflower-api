@@ -45,7 +45,7 @@ paths:
                 message: An unknown error occurred.
                 errorCode: E000
 
-  /signup:
+  /auth/signup:
     post:
       operationId: signup
       summary: Create a new user account.
@@ -123,7 +123,7 @@ paths:
                 message: An unknown error occurred.
                 errorCode: E000
 
-  /login:
+  /auth/login:
     post:
       operationId: login
       summary: Create a new user session.
@@ -202,7 +202,7 @@ paths:
                 message: An unknown error occurred.
                 errorCode: E000
 
-  /logout:
+  /auth/logout:
     post:
       operationId: logout
       summary: Log out the user.
@@ -220,9 +220,19 @@ paths:
                 $ref: "#/components/schemas/SuccessResponse"
               example:
                 message: User logged out successfully.
+          headers:
+            Set-Cookie:
+              description: Clears the `access_token` and `refresh_token` cookies.
+              schema:
+                type: string
+              examples:
+                access_token:
+                  value: "access_token=; Path=/; HttpOnly; Secure; SameSite=Strict;"
+                refresh_token:
+                  value: "refresh_token=; Path=/; HttpOnly; Secure; SameSite=Strict;"
         401:
           description: >
-            Unauthorized access, user is not logged in.
+            Unauthorized access, log in or refresh your session.
             Possible error codes include: E004.
           content:
             application/json:
@@ -243,7 +253,7 @@ paths:
                 message: An unknown error occurred.
                 errorCode: E000
 
-  /refresh-session:
+  /auth/refresh:
     post:
       operationId: refreshSession
       summary: Refresh user session using refresh token.
@@ -276,7 +286,6 @@ paths:
                   value: "access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkJ1bmR1ZG8iLCJpYXQiOjE3MDA4MDAwMDAsImV4cCI6MTcwMDgwMDkwMH0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=900"
                 refresh_token:
                   value: "refresh_token=2f7e4b38a4c942e9b1f2f53d0b63d66dbf7fbe9a12ea4d09c5a730e4f2a18a13; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=2592000"
-
         401:
           description: >
             Session has expired or is invalid, please log in.
@@ -298,7 +307,6 @@ paths:
                   value: "access_token=; Path=/; HttpOnly; Secure; SameSite=Strict;"
                 refresh_token:
                   value: "refresh_token=; Path=/; HttpOnly; Secure; SameSite=Strict;"
-
         500:
           description: >
             Unknown error.
@@ -332,7 +340,53 @@ paths:
                     properties:
                       data:
                         $ref: "#/components/schemas/GetAuthStatusResponse"
-        
+        500:
+          description: >
+            Unknown error.
+            Possible error codes include: E000.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                message: An unknown error occurred.
+                errorCode: E000
+
+  /users/me:
+    get:
+      operationId: getCurrentUser
+      summary: Get the current authenticated user's information.
+      description: Retrieve the information of the currently authenticated user.
+      tags:
+        - User account management
+      responses:
+        200:
+          description: Returns the information of the currently authenticated user, including name and email.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessResponseWithData"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/GetCurrentUserResponse"
+              example:
+                message: User information retrieved successfully.
+                data:
+                  name: John Doe
+                  email: johndoe@example.com
+        401:
+          description: >
+            Unauthorized access, please log in or refresh your session.
+            Possible error codes include: E004.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                message: Unauthorized access, please log in or refresh your session.
+                errorCode: E004
         500:
           description: >
             Unknown error.
@@ -402,7 +456,18 @@ components:
         authenticated:
           type: boolean
           description: Indicates if the user is authenticated.
-          example: true
+
+    GetCurrentUserResponse:
+      type: object
+      description: Response schema for the current authenticated user.
+      properties:
+        name:
+          type: string
+          description: Name of the authenticated user.
+        email:
+          type: string
+          description: Email of the authenticated user.
+          format: email
 
     SuccessResponse:
       type: object
@@ -445,19 +510,17 @@ components:
       type: object
       description: Field-specific errors.
       additionalProperties:
-        type:
-          - 'null'
-          - array
-        description: Errors for this field. If null, no errors for this field.
-        items:
-          type: object
-          description: Error details for the field.
-          properties:
-            message:
-              type: string
-              description: Error message for the field.
-            errorCode:
-              $ref: "#/components/schemas/ValidationErrorCode"
+        oneOf:
+          - type: 'null'
+            description: No errors for this field.
+          - type: array
+            description: Errors for this field.
+            properties:
+              message:
+                type: string
+                description: Error message for the field.
+              errorCode:
+                $ref: "#/components/schemas/ValidationErrorCode"
 
     ErrorCode:
       type: string
