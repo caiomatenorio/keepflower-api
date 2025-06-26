@@ -541,6 +541,7 @@ components:
       type: string
       description: Validation error code indicating the specific validation issue.
       enum:
+        - VE000 # Unknown validation error
         - VE001 # Required field missing
         - VE002 # Out of length range
         - VE003 # Blank input not allowed
