@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: keepflower-api
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/keepflower}
+    username: ${DB_USERNAME:keepflower}
+    password: ${DB_PASSWORD:keepflower}
+    driver-class-name: org.postgresql.Driver
