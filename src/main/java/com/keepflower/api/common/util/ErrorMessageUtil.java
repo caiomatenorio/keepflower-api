@@ -26,7 +26,6 @@ public class ErrorMessageUtil {
                     return Map.of(
                             "errorCode", errorCode.name(),
                             "message", message);
-
                 }, Collectors.toList())));
     }
 }
