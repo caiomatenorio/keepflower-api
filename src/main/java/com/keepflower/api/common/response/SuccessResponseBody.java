@@ -1,7 +1,6 @@
 package com.keepflower.api.common.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.NonNull;
 import org.springframework.lang.Nullable;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

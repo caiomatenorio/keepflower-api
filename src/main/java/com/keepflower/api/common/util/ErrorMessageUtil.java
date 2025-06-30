@@ -19,9 +19,14 @@ public class ErrorMessageUtil {
     public Map<String, List<Map<String, String>>> formatValidationErrors(BindingResult result) {
         return result.getFieldErrors().stream()
                 .collect(Collectors.groupingBy(FieldError::getField, Collectors.mapping(fieldError -> {
-                    ValidationErrorCode errorCode = ValidationErrorCode.valueOfOrDefault(fieldError.getDefaultMessage());
+                    ValidationErrorCode errorCode = ValidationErrorCode
+                            .valueOfOrDefault(fieldError.getDefaultMessage());
                     String message = errorCode.getMessage(messageSource, fieldError.getArguments());
-                    return Map.of("errorCode", errorCode.name(), "message", message);
+
+                    return Map.of(
+                            "errorCode", errorCode.name(),
+                            "message", message);
+
                 }, Collectors.toList())));
     }
 }
