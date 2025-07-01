@@ -10,10 +10,15 @@ import org.springframework.lang.Nullable;
 @Getter
 public enum ErrorCode {
     E000("error.unknown", 500),
-    E001("error.unauthorized", 401);
+    E001("error.unauthorized", 401),
+    E002("error.validation", 400);
 
     private final String messageKey;
     private final int statusCode;
+
+    public String getMessage(MessageSource messageSource) {
+        return getMessage(messageSource, (Object) null);
+    }
 
     public String getMessage(MessageSource messageSource, @Nullable Object... args) {
         return messageSource.getMessage(messageKey, args, LocaleContextHolder.getLocale());
