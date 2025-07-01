@@ -11,7 +11,7 @@ import java.util.Map;
 public record ErrorResponseBody(
         String message,
         ErrorCode errorCode,
-        @Nullable Map<String, List<Map<String, Object>>> errors) implements ResponseBody {
+        @Nullable Map<String, List<Map<String, String>>> errors) implements ResponseBody {
     public ErrorResponseBody(String message, ErrorCode errorCode) {
         this(message, errorCode, null);
     }
