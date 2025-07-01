@@ -15,6 +15,7 @@ public class AuthToken extends UsernamePasswordAuthenticationToken {
 
     public AuthToken(UUID sessionId, UUID userId, String username, String name) {
         super(username, null, List.of());
+
         this.sessionId = sessionId;
         this.userId = userId;
         this.username = username;

@@ -1,5 +1,6 @@
 package com.keepflower.api.config;
 
+import com.keepflower.api.common.util.AuthUtil;
 import com.keepflower.api.security.filter.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -18,19 +19,17 @@ import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWrite
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private static final String[] PUBLIC_ENDPOINTS = {
-            "/ping",
-            "/auth/status",
-            "/auth/signup",
-            "/auth/login",
-            "/auth/refresh"
-    };
-
     private final JwtFilter jwtFilter;
+    private final AuthUtil authUtil;
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(authUtil.getPublicEndpoints().toArray(String[]::new)).permitAll()
+                        .anyRequest().authenticated())
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
@@ -43,11 +42,7 @@ public class SecurityConfig {
                         .contentTypeOptions(Customizer.withDefaults())
                         .referrerPolicy(referrer -> referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
                         .permissionsPolicyHeader(policy -> policy.policy("accelerometer=(), autoplay=(), clipboard-write=(self), encrypted-media=(), geolocation=(), microphone=(), camera=(), fullscreen=(), payment=()")))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
-                        .anyRequest().authenticated())
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+
                 .build();
     }
 }
