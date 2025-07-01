@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -25,15 +26,18 @@ public class JwtUtil {
     @PostConstruct
     public void init() {
         String jwtSecret = jwtProperties.getSecret();
+
         if (jwtSecret == null || jwtSecret.length() < 32) {
             throw new IllegalArgumentException("JWT secret must be at least 32 characters long");
         }
+
         secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
     public String generate(UUID sessionId, UUID userId, String username, String name) {
-        Instant now = Instant.now();
-        Instant expiration = now.plusSeconds(jwtProperties.getExpirationSeconds());
+        var now = Instant.now();
+        var expiration = now.plusSeconds(jwtProperties.getExpirationSeconds());
+
         return Jwts.builder()
                 .subject(sessionId.toString())
                 .claim("userId", userId.toString())
@@ -53,7 +57,7 @@ public class JwtUtil {
         return parse(jwt).getPayload();
     }
 
-    public boolean isValid(String jwt) {
+    public boolean isValid(@Nullable String jwt) {
         try {
             parse(jwt);
             return true;
