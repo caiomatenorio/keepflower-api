@@ -1,4 +1,4 @@
-package com.keepflower.api.common.exception;
+package com.keepflower.api.exception;
 
 import com.keepflower.api.common.error_code.ErrorCode;
 

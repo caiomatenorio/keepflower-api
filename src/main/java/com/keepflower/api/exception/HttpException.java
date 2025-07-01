@@ -1,4 +1,4 @@
-package com.keepflower.api.common.exception;
+package com.keepflower.api.exception;
 
 import com.keepflower.api.common.error_code.ErrorCode;
 import lombok.Getter;
@@ -15,7 +15,7 @@ public class HttpException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
-    public String getMessage(MessageSource messageSource) {
+    public String getErrorMessage(MessageSource messageSource) {
         return errorCode.getMessage(messageSource, (Object) null);
     }
 }
