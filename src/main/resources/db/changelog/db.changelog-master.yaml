@@ -1,4 +1,5 @@
 databaseChangelog:
   - include:
       file: 001-create-table-users.yaml
-
+  - include:
+      file: 002-create-table-sessions.yaml
