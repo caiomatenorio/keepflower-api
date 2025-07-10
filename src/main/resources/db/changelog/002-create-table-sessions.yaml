@@ -1,20 +1,20 @@
-databaseChangelog:
+databaseChangeLog:
   - changeSet:
       id: 002-create-table-sessions
       author: caiomatenorio
       changes:
         - createTable:
-            tablename: session 
+            tableName: session
             columns:
               - column:
                   name: id
-                  type: uuid 
+                  type: uuid
                   constraints:
                     primaryKey: true
                     nullable: false
               - column:
                   name: user_id
-                  type: uuid 
+                  type: uuid
                   constraints:
                     nullable: false
               - column:
@@ -25,7 +25,7 @@ databaseChangelog:
                     nullable: false
               - column:
                   name: created_at
-                  type: timestamp 
+                  type: timestamp
                   constraints:
                     nullable: false
               - column:
@@ -38,6 +38,5 @@ databaseChangelog:
             baseColumnNames: user_id
             constraintName: fk_session_user_id
             referencedTableName: users
-            referencedColumnNames: id 
+            referencedColumnNames: id
             onDelete: CASCADE
-

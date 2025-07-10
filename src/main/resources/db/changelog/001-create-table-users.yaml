@@ -1,14 +1,14 @@
-databaseChangelog:
+databaseChangeLog:
   - changeSet:
       id: 001-create-table-users
       author: caiomatenorio
       changes:
         - createTable:
-            tableName: users 
+            tableName: users
             columns:
               - column:
                   name: id
-                  type: uuid 
+                  type: uuid
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -23,4 +23,3 @@ databaseChangelog:
                   type: varchar(255)
                   constraints:
                     nullable: false
-

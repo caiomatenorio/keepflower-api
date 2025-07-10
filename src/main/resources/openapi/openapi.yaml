@@ -10,10 +10,10 @@ info:
   version: 1.0.0
 
 servers:
-  - url: 'http'
+  - url: "http"
 
 security:
-  - cookieAuth: [ ]
+  - cookieAuth: []
 
 paths:
   /ping:
@@ -23,7 +23,7 @@ paths:
       description: Ping the server to check if it is running.
       tags:
         - General
-      security: [ ]
+      security: []
       responses:
         200:
           description: The server is running and responsive.
@@ -53,7 +53,7 @@ paths:
       tags:
         - Authentication
         - User account management
-      security: [ ]
+      security: []
       requestBody:
         required: true
         content:
@@ -130,7 +130,7 @@ paths:
       description: Login with user's credentials and receive access and refresh tokens.
       tags:
         - Authentication
-      security: [ ]
+      security: []
       requestBody:
         required: true
         content:
@@ -263,7 +263,7 @@ paths:
       tags:
         - Authentication
       security:
-        - refreshTokenAuth: [ ]
+        - refreshTokenAuth: []
       responses:
         200:
           description: Session refreshed successfully, returning new access and refresh tokens.
@@ -484,7 +484,7 @@ components:
     SuccessResponseWithData:
       description: Success response schema containing data.
       allOf:
-        - $ref: '#/components/schemas/SuccessResponse'
+        - $ref: "#/components/schemas/SuccessResponse"
         - type: object
           properties:
             data:
@@ -515,7 +515,7 @@ components:
       description: Field-specific errors.
       additionalProperties:
         oneOf:
-          - type: 'null'
+          - type: "null"
             description: No errors for this field.
           - type: array
             description: Errors for this field.

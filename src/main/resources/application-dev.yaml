@@ -1,0 +1,18 @@
+app:
+  session:
+    jwt:
+      expiration-seconds: 900 # 15 minutes
+      secret: secret123456789012345678901234567890
+    expiration-seconds: 2592000 # 30 days
+
+debug: true
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/keepflower
+    username: keepflower
+    password: keepflower
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-dev.yaml
+  jpa:
+    show-sql: true
