@@ -25,10 +25,12 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(authUtil.getPublicEndpoints().toArray(String[]::new)).permitAll()
+                        .requestMatchers(authUtil.getPublicEndpoints().toArray(String[]::new))
+                        .permitAll()
                         .anyRequest().authenticated())
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
@@ -37,12 +39,14 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .headers(headers -> headers
                         .cacheControl(Customizer.withDefaults())
-                        .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self';"))
+                        .contentSecurityPolicy(csp -> csp
+                                .policyDirectives("default-src 'self';"))
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
                         .contentTypeOptions(Customizer.withDefaults())
-                        .referrerPolicy(referrer -> referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
-                        .permissionsPolicyHeader(policy -> policy.policy("accelerometer=(), autoplay=(), clipboard-write=(self), encrypted-media=(), geolocation=(), microphone=(), camera=(), fullscreen=(), payment=()")))
-
+                        .referrerPolicy(referrer -> referrer
+                                .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+                        .permissionsPolicyHeader(policy -> policy
+                                .policy("accelerometer=(), autoplay=(), clipboard-write=(self), encrypted-media=(), geolocation=(), microphone=(), camera=(), fullscreen=(), payment=()")))
                 .build();
     }
 }

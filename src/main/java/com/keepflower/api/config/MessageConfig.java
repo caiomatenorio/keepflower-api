@@ -9,8 +9,8 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 @Configuration
 public class MessageConfig {
     @Bean
-    public MessageSource messageSource() {
-        var source = new ReloadableResourceBundleMessageSource();
+    MessageSource messageSource() {
+        ReloadableResourceBundleMessageSource source = new ReloadableResourceBundleMessageSource();
         source.setBasename("classpath:messages/messages");
         source.setDefaultEncoding("UTF-8");
         source.setFallbackToSystemLocale(false);
@@ -18,8 +18,8 @@ public class MessageConfig {
     }
 
     @Bean
-    public LocalValidatorFactoryBean validator() {
-        var bean = new LocalValidatorFactoryBean();
+    LocalValidatorFactoryBean validator() {
+        LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
         bean.setValidationMessageSource(messageSource());
         return bean;
     }

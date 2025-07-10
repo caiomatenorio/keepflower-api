@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 public class JacksonConfig {
     @Bean
     ObjectMapper objectMapper() {
-        var mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
