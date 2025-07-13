@@ -15,13 +15,6 @@ public class HttpException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
-    /**
-     * Returns the localized error message for the error code associated with this
-     * exception, using the given message source.
-     *
-     * @param messageSource the message source to use for message retrieval
-     * @return the localized error message
-     */
     public String getErrorMessage(MessageSource messageSource) {
         return errorCode.getMessage(messageSource, (Object) null);
     }

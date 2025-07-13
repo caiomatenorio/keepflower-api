@@ -16,27 +16,10 @@ public enum ErrorCode {
     private final String messageKey;
     private final int statusCode;
 
-    /**
-     * Retrieves the message corresponding to this error code using the provided
-     * MessageSource and the current locale. This method does not use any
-     * additional arguments for message formatting.
-     *
-     * @param messageSource the MessageSource to use for message retrieval
-     * @return the localized message string
-     */
     public String getMessage(MessageSource messageSource) {
         return getMessage(messageSource, (Object) null);
     }
 
-    /**
-     * Retrieves the message corresponding to this error code using the provided
-     * MessageSource, the current locale, and the given message formatting
-     * arguments.
-     *
-     * @param messageSource the MessageSource to use for message retrieval
-     * @param args          the arguments to use for message formatting
-     * @return the localized message string
-     */
     public String getMessage(MessageSource messageSource, @Nullable Object... args) {
         return messageSource.getMessage(messageKey, args, LocaleContextHolder.getLocale());
     }
