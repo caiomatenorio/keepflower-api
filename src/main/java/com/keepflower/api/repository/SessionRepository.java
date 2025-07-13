@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.keepflower.api.model.Session;
 
-public interface SessionService extends JpaRepository<Session, UUID> {
+public interface SessionRepository extends JpaRepository<Session, UUID> {
 
 }
