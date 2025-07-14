@@ -5,8 +5,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.keepflower.api.common.validation.validator.UsernameValidator;
-
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import jakarta.validation.constraints.Max;
@@ -24,7 +22,7 @@ import jakarta.validation.constraints.Pattern;
 @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "VE002A")
 @Min(value = 3, message = "VE002B")
 @Max(value = 32, message = "VE002C")
-@Constraint(validatedBy = UsernameValidator.class)
+@Constraint(validatedBy = {})
 @Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidUsername {
