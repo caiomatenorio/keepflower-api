@@ -1,5 +1,5 @@
 package com.keepflower.api.common.response;
 
-public interface ResponseBody {
+public sealed interface ResponseBody permits SuccessResponseBody, ErrorResponseBody {
     String message();
 }
