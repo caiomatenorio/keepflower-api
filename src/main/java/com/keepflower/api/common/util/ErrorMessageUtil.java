@@ -20,10 +20,15 @@ public class ErrorMessageUtil {
         return result.getFieldErrors()
                 .stream()
                 .collect(Collectors.groupingBy(FieldError::getField, Collectors.mapping(fieldError -> {
-                    ValidationErrorCode errorCode = ValidationErrorCode
-                            .valueOfOrDefault(fieldError.getDefaultMessage());
+                    String defaultMessage = fieldError.getDefaultMessage();
+
+                    if (defaultMessage == null || defaultMessage.equals("*")) {
+                        return null;
+                    }
+
+                    ValidationErrorCode errorCode = ValidationErrorCode.valueOfOrDefault(defaultMessage);
                     String message = errorCode.getMessage(messageSource, fieldError.getArguments());
                     return Map.of("errorCode", errorCode.name(), "message", message);
-                }, Collectors.toList())));
+                }, Collectors.filtering((Map<String, String> error) -> error != null, Collectors.toList()))));
     }
 }

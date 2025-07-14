@@ -13,7 +13,6 @@ import java.util.stream.Stream;
 public enum ValidationErrorCode {
     VE000("validation.unknown"),
     VE001("validation.required"),
-    VE002("validation.username"),
     VE002A("validation.username.characters"),
     VE002B("validation.username.min-length"),
     VE002C("validation.username.max-length");
