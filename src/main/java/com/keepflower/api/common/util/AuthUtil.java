@@ -14,10 +14,10 @@ import java.util.UUID;
 public class AuthUtil {
     private final Set<String> publicEndpoints = Set.of(
             "/ping",
-            "/auth/status",
-            "/auth/signup",
-            "/auth/login",
-            "/auth/refresh");
+            "/signup",
+            "/login",
+            "/auth/refresh",
+            "/auth/status");
 
     public void authenticate(UUID sessionId, UUID userId, String username, String name) {
         SecurityContextHolder.getContext().setAuthentication(new AuthToken(sessionId, userId, username, name));
