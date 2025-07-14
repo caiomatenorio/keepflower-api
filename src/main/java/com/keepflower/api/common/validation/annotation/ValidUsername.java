@@ -28,7 +28,7 @@ import jakarta.validation.constraints.Pattern;
 @Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidUsername {
-    String message() default "*"; // It will be hidden in response formatting
+    String message() default "*"; // Hidden in response messages
 
     Class<?>[] groups() default {};
 
