@@ -12,7 +12,8 @@ import java.util.stream.Stream;
 @Getter
 public enum ValidationErrorCode {
     VE000("validation.unknown"),
-    VE001("validation.required");
+    VE001("validation.required"),
+    VE002("validation.username.invalid");
 
     private final String messageKey;
 
