@@ -14,8 +14,13 @@ public enum ValidationErrorCode {
     VE000("validation.unknown"),
     VE001("validation.required"),
     VE002A("validation.username.characters"),
-    VE002B("validation.username.min-length"),
-    VE002C("validation.username.max-length");
+    VE002B("validation.username.size"),
+    VE003A("validation.password.required.uppercase"),
+    VE003B("validation.password.required.lowercase"),
+    VE003C("validation.password.required.digit"),
+    VE003D("validation.password.required.special"),
+    VE003E("validation.password.characters"),
+    VE003F("validation.password.size");
 
     private final String messageKey;
 

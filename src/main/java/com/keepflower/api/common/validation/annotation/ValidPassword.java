@@ -10,20 +10,16 @@ import jakarta.validation.Payload;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-/**
- * Annotation for validating usernames. Constraints include:
- * <ul>
- * <li>Must contain only alphanumeric characters and underscores</li>
- * <li>Minimum length of 3 characters</li>
- * <li>Maximum length of 32 characters</li>
- * </ul>
- */
-@Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "VE002A")
-@Size(min = 3, max = 32, message = "VE002B")
+@Pattern(regexp = "^(?=.*[A-Z]).*$", message = "VE003A")
+@Pattern(regexp = "^(?=.*[a-z]).*$", message = "VE003B")
+@Pattern(regexp = "^(?=.*\\d).*$", message = "VE003C")
+@Pattern(regexp = "^(?=.*[@$!%*?&#^~.,:;+=_\\-\\(\\)\\[\\]\\{\\}<>|\\\\/\"'`]).*$", message = "VE003D")
+@Pattern(regexp = "^[A-Za-z0-9@$!%*?&#^~.,:;+=_\\-\\(\\)\\[\\]\\{\\}<>|\\\\/\"'`]{8,32}$", message = "VE003E")
+@Size(min = 8, max = 32, message = "VE003F")
 @Constraint(validatedBy = {})
 @Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValidUsername {
+public @interface ValidPassword {
     String message() default "*"; // Hidden in response messages
 
     Class<?>[] groups() default {};

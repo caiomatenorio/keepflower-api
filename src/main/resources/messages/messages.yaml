@@ -8,5 +8,12 @@ validation:
   required: The field {0} is required
   username: 
     characters: The username must contain only alphanumeric characters and underscores
-    min-length: The username must be at least {0} characters long
-    max-length: The username must be at most {0} characters long
+    size: The username must be between {0} and {1} characters long
+  password:
+    required:
+      uppercase: The password must contain at least one uppercase letter
+      lowercase: The password must contain at least one lowercase letter
+      digit: The password must contain at least one digit
+      special: The password must contain at least one special character (@$!%*?&#^~.,:;+=_-()[\]{}<>|/"'`)
+    characters: The password must contain only alphanumeric characters and accepted special characters (@$!%*?&#^~.,:;+=_-()[\]{}<>|/"'`)
+    size: The password must be between {0} and {1} characters long
