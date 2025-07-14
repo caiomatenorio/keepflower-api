@@ -11,7 +11,8 @@ import org.springframework.lang.Nullable;
 public enum ErrorCode {
     E000("error.unknown", 500),
     E001("error.unauthorized", 401),
-    E002("error.validation", 400);
+    E002("error.validation", 400),
+    E003("error.username_already_in_use", 409);
 
     private final String messageKey;
     private final int statusCode;
