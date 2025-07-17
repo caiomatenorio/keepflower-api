@@ -16,7 +16,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
-    private boolean isUsernameInUse(String username) {
+    protected boolean isUsernameInUse(String username) {
         return userRepository.existsByUsername(username);
     }
 

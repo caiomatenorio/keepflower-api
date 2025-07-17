@@ -9,6 +9,7 @@ import org.springframework.validation.FieldError;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -29,6 +30,6 @@ public class ErrorMessageUtil {
                     ValidationErrorCode errorCode = ValidationErrorCode.valueOfOrDefault(defaultMessage);
                     String message = errorCode.getMessage(messageSource, fieldError.getArguments());
                     return Map.of("errorCode", errorCode.name(), "message", message);
-                }, Collectors.filtering((Map<String, String> error) -> error != null, Collectors.toList()))));
+                }, Collectors.filtering(Objects::nonNull, Collectors.toList()))));
     }
 }

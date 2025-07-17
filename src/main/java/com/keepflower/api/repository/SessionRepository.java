@@ -7,5 +7,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.keepflower.api.model.Session;
 
 public interface SessionRepository extends JpaRepository<Session, UUID> {
-
 }
