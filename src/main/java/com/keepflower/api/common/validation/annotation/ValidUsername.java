@@ -11,17 +11,16 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 /**
- * Annotation for validating usernames. Constraints include:
+ * Custom annotation for validating usernames. The username must:
  * <ul>
- * <li>Must contain only alphanumeric characters and underscores</li>
- * <li>Minimum length of 3 characters</li>
- * <li>Maximum length of 32 characters</li>
+ *     <li>Contain only alphanumeric characters and underscores</li>
+ *     <li>Be between 3 and 32 characters long</li>
  * </ul>
  */
 @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "VE002A")
 @Size(min = 3, max = 32, message = "VE002B")
 @Constraint(validatedBy = {})
-@Target({ ElementType.FIELD, ElementType.PARAMETER })
+@Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidUsername {
     String message() default "*"; // Hidden in response messages
