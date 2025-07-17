@@ -10,8 +10,8 @@ debug: true
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/keepflower
-    username: keepflower
-    password: keepflower
+    username: postgres
+    password: postgres
   liquibase:
     change-log: classpath:db/changelog/db.changelog-dev.yaml
   jpa:

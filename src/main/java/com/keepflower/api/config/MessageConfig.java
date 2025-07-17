@@ -11,8 +11,12 @@ public class MessageConfig {
     @Bean
     MessageSource messageSource() {
         ReloadableResourceBundleMessageSource source = new ReloadableResourceBundleMessageSource();
-        source.setBasename("classpath:messages/messages");
+        source.setBasenames(
+                "classpath:messages/messages",
+                "classpath:messages/errors",
+                "classpath:messages/validation-errors");
         source.setDefaultEncoding("UTF-8");
+        source.setCacheSeconds(3600); // 1 hour cache
         source.setFallbackToSystemLocale(false);
         return source;
     }
