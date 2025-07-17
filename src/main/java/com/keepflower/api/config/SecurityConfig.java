@@ -48,7 +48,15 @@ public class SecurityConfig {
                         .referrerPolicy(referrer -> referrer
                                 .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
                         .permissionsPolicyHeader(policy -> policy
-                                .policy("accelerometer=(), autoplay=(), clipboard-write=(self), encrypted-media=(), geolocation=(), microphone=(), camera=(), fullscreen=(), payment=()")))
+                                .policy("accelerometer=(), " +
+                                        "autoplay=(), " +
+                                        "clipboard-write=(self), " +
+                                        "encrypted-media=(), " +
+                                        "geolocation=(), " +
+                                        "microphone=(), " +
+                                        "camera=(), " +
+                                        "fullscreen=(), " +
+                                        "payment=()")))
                 .build();
     }
 
