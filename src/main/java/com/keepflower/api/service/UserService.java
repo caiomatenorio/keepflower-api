@@ -1,11 +1,13 @@
 package com.keepflower.api.service;
 
+import com.keepflower.api.exception.UserNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.keepflower.api.exception.UsernameAlreadyInUseException;
 import com.keepflower.api.model.User;
 import com.keepflower.api.repository.UserRepository;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -15,8 +17,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional(readOnly = true)
-    protected boolean isUsernameInUse(String username) {
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    public boolean isUsernameInUse(String username) {
         return userRepository.existsByUsername(username);
     }
 
@@ -35,5 +37,18 @@ public class UserService {
         user.setUsername(username);
         user.setPasswordHash(encodedPassword);
         userRepository.save(user);
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    public boolean validateCredentials(String username, String password) {
+        return userRepository.findByUsername(username)
+                .map(user -> passwordEncoder.matches(password, user.getPasswordHash()))
+                .orElse(false);
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    public User findByUsernameOrThrow(String username) throws UserNotFoundException {
+        return userRepository.findByUsername(username)
+                .orElseThrow(UserNotFoundException::new);
     }
 }

@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.keepflower.api.common.error_code.ErrorCode;
 import com.keepflower.api.common.response.ErrorResponseBody;
 import com.keepflower.api.common.response.ResponseBody;
-import com.keepflower.api.common.util.AuthUtil;
 import com.keepflower.api.common.util.ErrorMessageUtil;
 import com.keepflower.api.common.util.JwtUtil;
 import com.keepflower.api.exception.UnauthorizedException;
+import com.keepflower.api.service.AuthService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -29,27 +29,25 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
-    private final AuthUtil authUtil;
     private final ObjectMapper objectMapper;
     private final ErrorMessageUtil errorMessageUtil;
+    private final AuthService authService;
 
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain) throws ServletException, IOException, UnauthorizedException {
-        String jwt = getJwtFromRequest(request);
-
-        if (!jwtUtil.isValid(jwt)) {
-            ErrorCode errorCode = ErrorCode.E001;
-            String message = errorMessageUtil.getCodeMessage(errorCode);
-            ErrorResponseBody responseBody = new ErrorResponseBody(message, errorCode);
-            writeResponse(response, errorCode.getStatusCode(), responseBody);
-            return;
+            @NonNull FilterChain filterChain) throws ServletException, IOException {
+        try {
+            String jwt = jwtUtil.getJwtFromRequest(request);
+            if (!jwtUtil.isValid(jwt)) {
+                throw new UnauthorizedException();
+            }
+            authenticate(jwt);
+            filterChain.doFilter(request, response);
+        } catch (UnauthorizedException e) {
+            writeUnauthorizedResponse(response);
         }
-
-        authenticate(jwt);
-        filterChain.doFilter(request, response);
     }
 
     @Override
@@ -57,14 +55,6 @@ public class JwtFilter extends OncePerRequestFilter {
         return Set.of("/ping", "/signup", "/login", "/auth/refresh", "/auth/status").contains(request.getRequestURI());
     }
 
-    private @Nullable String getJwtFromRequest(HttpServletRequest request) {
-        return Optional.ofNullable(request.getCookies())
-                .flatMap(cookies -> Arrays.stream(cookies)
-                        .filter(cookie -> cookie.getName().equals("access_token"))
-                        .findFirst())
-                .map(Cookie::getValue)
-                .orElse(null);
-    }
 
     private void writeResponse(
             HttpServletResponse response,
@@ -76,11 +66,17 @@ public class JwtFilter extends OncePerRequestFilter {
         objectMapper.writeValue(response.getWriter(), responseBody);
     }
 
+    private void writeUnauthorizedResponse(HttpServletResponse response) throws IOException {
+        ErrorCode errorCode = ErrorCode.E001;
+        String message = errorMessageUtil.getCodeMessage(errorCode);
+        ErrorResponseBody responseBody = new ErrorResponseBody(message, errorCode);
+        writeResponse(response, errorCode.getStatusCode(), responseBody);
+    }
+
     private void authenticate(String jwt) {
         UUID sessionId = jwtUtil.getSessionId(jwt);
         UUID userId = jwtUtil.getUserId(jwt);
         String username = jwtUtil.getUsername(jwt);
-        String name = jwtUtil.getName(jwt);
-        authUtil.authenticate(sessionId, userId, username, name);
+        authService.authenticate(sessionId, userId, username);
     }
 }

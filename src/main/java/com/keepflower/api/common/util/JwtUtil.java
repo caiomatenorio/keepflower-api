@@ -1,6 +1,7 @@
 package com.keepflower.api.common.util;
 
 import com.keepflower.api.config.properties.JwtProperties;
+import com.keepflower.api.exception.UnauthorizedException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
@@ -8,13 +9,17 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -34,7 +39,7 @@ public class JwtUtil {
         secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generate(UUID sessionId, UUID userId, String username, String name) {
+    public String generate(UUID sessionId, UUID userId, String username) {
         Instant now = Instant.now();
         Instant expiration = now.plusSeconds(jwtProperties.getExpirationSeconds());
 
@@ -42,7 +47,6 @@ public class JwtUtil {
                 .subject(sessionId.toString())
                 .claim("userId", userId.toString())
                 .claim("username", username)
-                .claim("name", name)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiration))
                 .signWith(secretKey)
@@ -78,7 +82,13 @@ public class JwtUtil {
         return getPayload(jwt).get("username", String.class);
     }
 
-    public String getName(String jwt) throws JwtException, IllegalArgumentException {
-        return getPayload(jwt).get("name", String.class);
+    @Nullable
+    public String getJwtFromRequest(HttpServletRequest request) {
+        return Optional.ofNullable(request.getCookies())
+                .flatMap(cookies -> Arrays.stream(cookies)
+                        .filter(cookie -> cookie.getName().equals("access_token"))
+                        .findFirst())
+                .map(Cookie::getValue)
+                .orElse(null);
     }
 }

@@ -10,7 +10,8 @@ public enum ErrorCode implements CodeWithMessageKey {
     E000("error.unknown", 500),
     E001("error.unauthorized", 401),
     E002("error.validation", 400),
-    E003("error.username-already-in-use", 409);
+    E003("error.username-already-in-use", 409),
+    E004("error.invalid-credentials", 401);
 
     private final String messageKey;
     private final int statusCode;

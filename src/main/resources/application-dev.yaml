@@ -3,6 +3,8 @@ app:
     jwt:
       expiration-seconds: 900 # 15 minutes
       secret: secret123456789012345678901234567890
+    refresh-token:
+      length: 64
     expiration-seconds: 2592000 # 30 days
 
 debug: true

@@ -3,6 +3,8 @@ app:
     jwt:
       expiration-seconds: ${JWT_EXPIRATION_SECONDS}
       secret: ${JWT_SECRET} # at least 32 chars
+    refresh-token:
+      length: ${REFRESH_TOKEN_LENGTH}
     expiration-seconds: ${SESSION_EXPIRATION_SECONDS}
 
 spring:
