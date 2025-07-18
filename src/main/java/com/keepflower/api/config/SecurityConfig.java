@@ -1,6 +1,5 @@
 package com.keepflower.api.config;
 
-import com.keepflower.api.common.filter.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,49 +15,40 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 
+import com.keepflower.api.security.AuthUtil;
+import com.keepflower.api.security.JwtFilter;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final JwtFilter jwtFilter;
+	private final JwtFilter jwtFilter;
+	private final AuthUtil authUtil;
 
-    @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/ping", "/signup", "/login", "/auth/refresh", "/auth/status").permitAll()
-                        .anyRequest().authenticated())
-                .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .logout(AbstractHttpConfigurer::disable)
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
-                .headers(headers -> headers.
-                        cacheControl(Customizer.withDefaults())
-                        .contentSecurityPolicy(csp -> csp
-                                .policyDirectives("default-src 'self';"))
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
-                        .contentTypeOptions(Customizer.withDefaults())
-                        .referrerPolicy(referrer -> referrer
-                                .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
-                        .permissionsPolicyHeader(policy -> policy
-                                .policy("accelerometer=(), " +
-                                        "autoplay=(), " +
-                                        "clipboard-write=(self), " +
-                                        "encrypted-media=(), " +
-                                        "geolocation=(), " +
-                                        "microphone=(), " +
-                                        "camera=(), " +
-                                        "fullscreen=(), " +
-                                        "payment=()")))
-                .build();
-    }
+	@Bean
+	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		return http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+				.authorizeHttpRequests(auth -> auth
+						.requestMatchers(authUtil.getPublicPaths().toArray(String[]::new)).permitAll()
+						.anyRequest().authenticated())
+				.formLogin(AbstractHttpConfigurer::disable).httpBasic(AbstractHttpConfigurer::disable)
+				.logout(AbstractHttpConfigurer::disable).csrf(AbstractHttpConfigurer::disable)
+				.cors(Customizer.withDefaults())
+				.headers(headers -> headers.cacheControl(Customizer.withDefaults())
+						.contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self';"))
+						.frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
+						.contentTypeOptions(Customizer.withDefaults())
+						.referrerPolicy(referrer -> referrer
+								.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+						.permissionsPolicyHeader(policy -> policy.policy("accelerometer=(), " + "autoplay=(), "
+								+ "clipboard-write=(self), " + "encrypted-media=(), " + "geolocation=(), "
+								+ "microphone=(), " + "camera=(), " + "fullscreen=(), " + "payment=()")))
+				.build();
+	}
 
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+	@Bean
+	PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 }

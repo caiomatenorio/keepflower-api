@@ -1,7 +1,16 @@
 package com.keepflower.api.common.util;
 
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.Date;
+import java.util.UUID;
+
+import javax.crypto.SecretKey;
+
+import org.springframework.stereotype.Component;
+
 import com.keepflower.api.config.properties.JwtProperties;
-import com.keepflower.api.exception.UnauthorizedException;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
@@ -9,18 +18,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -80,15 +78,5 @@ public class JwtUtil {
 
     public String getUsername(String jwt) throws JwtException, IllegalArgumentException {
         return getPayload(jwt).get("username", String.class);
-    }
-
-    @Nullable
-    public String getJwtFromRequest(HttpServletRequest request) {
-        return Optional.ofNullable(request.getCookies())
-                .flatMap(cookies -> Arrays.stream(cookies)
-                        .filter(cookie -> cookie.getName().equals("access_token"))
-                        .findFirst())
-                .map(Cookie::getValue)
-                .orElse(null);
     }
 }

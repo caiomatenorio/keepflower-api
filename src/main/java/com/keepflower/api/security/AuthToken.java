@@ -1,4 +1,4 @@
-package com.keepflower.api.common.token;
+package com.keepflower.api.security;
 
 import lombok.Getter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

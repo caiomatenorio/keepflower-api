@@ -1,7 +1,6 @@
 package com.keepflower.api.service;
 
 import com.keepflower.api.common.util.CookieUtil;
-import com.keepflower.api.common.util.JwtUtil;
 import com.keepflower.api.config.properties.JwtProperties;
 import com.keepflower.api.config.properties.RefreshTokenProperties;
 import com.keepflower.api.config.properties.SessionProperties;

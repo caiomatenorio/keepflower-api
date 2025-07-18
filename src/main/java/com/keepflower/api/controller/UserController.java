@@ -1,5 +1,6 @@
 package com.keepflower.api.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,11 +17,11 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 public class UserController {
-    private final UserService userService;
+	private final UserService userService;
 
-    @PostMapping("/signup")
-    public ResponseEntity<ResponseBody> signUp(@RequestBody @Valid SignUpRequest signUpRequest) {
-        userService.createUser(signUpRequest.username(), signUpRequest.password());
-        return ResponseEntity.ok(new SuccessResponseBody<>("User created successfully"));
-    }
+	@PostMapping("/signup")
+	public ResponseEntity<ResponseBody> signUp(@RequestBody @Valid SignUpRequest body) {
+		userService.createUser(body.username(), body.password());
+		return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponseBody<>("User created successfully!"));
+	}
 }
