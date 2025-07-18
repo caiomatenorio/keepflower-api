@@ -5,12 +5,12 @@ import com.keepflower.api.common.response.ErrorResponseBody;
 import com.keepflower.api.common.response.ResponseBody;
 import com.keepflower.api.common.util.CookieUtil;
 import com.keepflower.api.common.util.ErrorMessageUtil;
+import com.keepflower.api.common.validation.ValidationError;
 import com.keepflower.api.service.SessionService;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -26,7 +26,6 @@ import java.util.Map;
 public class GlobalExceptionHandler {
     private final CookieUtil cookieUtil;
     private final ErrorMessageUtil errorMessageUtil;
-    private final MessageSource messageSource;
     private final SessionService sessionService;
     private final Environment environment;
 
@@ -39,24 +38,30 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ResponseBody> handleUnauthorizedException(UnauthorizedException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        String message = errorMessageUtil.getCodeMessage(errorCode);
+
         return ResponseEntity
                 .status(e.getStatusCode())
                 .headers(cookieUtil.cookiesToHeadersConsumer(sessionService.deleteSessionCookies()))
-                .body(new ErrorResponseBody(e.getErrorMessage(messageSource), e.getErrorCode()));
+                .body(new ErrorResponseBody(message, errorCode));
     }
-
+    
     @ExceptionHandler(HttpException.class)
     public ResponseEntity<ResponseBody> handleHttpException(HttpException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        String message = errorMessageUtil.getCodeMessage(errorCode);
+
         return ResponseEntity
                 .status(e.getStatusCode())
-                .body(new ErrorResponseBody(e.getErrorMessage(messageSource), e.getErrorCode()));
+                .body(new ErrorResponseBody(message, errorCode));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ResponseBody> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         ErrorCode errorCode = ErrorCode.E002;
-        String message = errorCode.getMessage(messageSource);
-        Map<String, List<Map<String, String>>> errors = errorMessageUtil.formatValidationErrors(e.getBindingResult());
+        String message = errorMessageUtil.getCodeMessage(errorCode);
+        Map<String, List<ValidationError>> errors = errorMessageUtil.formatValidationErrors(e.getBindingResult());
 
         return ResponseEntity
                 .badRequest()
@@ -66,7 +71,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ResponseBody> handleException(Exception e) {
         ErrorCode errorCode = ErrorCode.E000;
-        String message = isProd ? errorCode.getMessage(messageSource) : e.getMessage();
+        String message = isProd ? errorMessageUtil.getCodeMessage(errorCode) : e.getMessage();
 
         return ResponseEntity
                 .internalServerError()

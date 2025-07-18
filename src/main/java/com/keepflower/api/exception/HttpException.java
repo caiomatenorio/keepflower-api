@@ -2,7 +2,6 @@ package com.keepflower.api.exception;
 
 import com.keepflower.api.common.error_code.ErrorCode;
 import lombok.Getter;
-import org.springframework.context.MessageSource;
 
 @Getter
 public class HttpException extends RuntimeException {
@@ -13,9 +12,5 @@ public class HttpException extends RuntimeException {
         super(errorCode.name());
         this.statusCode = errorCode.getStatusCode();
         this.errorCode = errorCode;
-    }
-
-    public String getErrorMessage(MessageSource messageSource) {
-        return errorCode.getMessage(messageSource, (Object) null);
     }
 }

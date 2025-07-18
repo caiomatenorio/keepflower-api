@@ -1,10 +1,11 @@
-package com.keepflower.api.security.filter;
+package com.keepflower.api.common.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.keepflower.api.common.error_code.ErrorCode;
 import com.keepflower.api.common.response.ErrorResponseBody;
 import com.keepflower.api.common.response.ResponseBody;
 import com.keepflower.api.common.util.AuthUtil;
+import com.keepflower.api.common.util.ErrorMessageUtil;
 import com.keepflower.api.common.util.JwtUtil;
 import com.keepflower.api.exception.UnauthorizedException;
 import jakarta.servlet.FilterChain;
@@ -13,7 +14,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
@@ -22,6 +22,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Component
@@ -30,7 +31,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final AuthUtil authUtil;
     private final ObjectMapper objectMapper;
-    private final MessageSource messageSource;
+    private final ErrorMessageUtil errorMessageUtil;
 
     @Override
     protected void doFilterInternal(
@@ -41,7 +42,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (!jwtUtil.isValid(jwt)) {
             ErrorCode errorCode = ErrorCode.E001;
-            ErrorResponseBody responseBody = new ErrorResponseBody(errorCode.getMessage(messageSource), errorCode);
+            String message = errorMessageUtil.getCodeMessage(errorCode);
+            ErrorResponseBody responseBody = new ErrorResponseBody(message, errorCode);
             writeResponse(response, errorCode.getStatusCode(), responseBody);
             return;
         }
@@ -52,8 +54,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
-        String path = request.getServletPath();
-        return authUtil.getPublicEndpoints().contains(path);
+        return Set.of("/ping", "/signup", "/login", "/auth/refresh", "/auth/status").contains(request.getRequestURI());
     }
 
     private @Nullable String getJwtFromRequest(HttpServletRequest request) {

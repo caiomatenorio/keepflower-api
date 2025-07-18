@@ -2,6 +2,7 @@ package com.keepflower.api.common.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.keepflower.api.common.error_code.ErrorCode;
+import com.keepflower.api.common.validation.ValidationError;
 import org.springframework.lang.Nullable;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.Map;
 public record ErrorResponseBody(
         String message,
         ErrorCode errorCode,
-        @Nullable Map<String, List<Map<String, String>>> errors) implements ResponseBody {
+        @Nullable Map<String, List<ValidationError>> errors) implements ResponseBody {
     public ErrorResponseBody(String message, ErrorCode errorCode) {
         this(message, errorCode, null);
     }

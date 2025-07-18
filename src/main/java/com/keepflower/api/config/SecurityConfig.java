@@ -1,7 +1,6 @@
 package com.keepflower.api.config;
 
-import com.keepflower.api.common.util.AuthUtil;
-import com.keepflower.api.security.filter.JwtFilter;
+import com.keepflower.api.common.filter.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +21,6 @@ import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWrite
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtFilter jwtFilter;
-    private final AuthUtil authUtil;
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -31,16 +29,15 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(authUtil.getPublicEndpoints().toArray(String[]::new))
-                        .permitAll()
+                        .requestMatchers("/ping", "/signup", "/login", "/auth/refresh", "/auth/status").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .headers(headers -> headers
-                        .cacheControl(Customizer.withDefaults())
+                .headers(headers -> headers.
+                        cacheControl(Customizer.withDefaults())
                         .contentSecurityPolicy(csp -> csp
                                 .policyDirectives("default-src 'self';"))
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)

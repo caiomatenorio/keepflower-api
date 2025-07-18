@@ -27,7 +27,7 @@ public class UserService {
     @Transactional
     public void createUser(String username, String password) throws UsernameAlreadyInUseException {
         if (isUsernameInUse(username)) {
-            throw new UsernameAlreadyInUseException();
+            throw new UsernameAlreadyInUseException(username);
         }
 
         String encodedPassword = encodePassword(password);
